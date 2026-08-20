@@ -11,7 +11,7 @@ cloudinary.config({
 });
 
 
-export const uploadOnCloudinary = async(localFilePath) => {
+export const uploadOnCloudinary = async(localFilePath,folderName = "medical_scans") => {
     try{
         if(!localFilePath){
             throw new ApiError(404,"File not found on local server");
@@ -19,7 +19,8 @@ export const uploadOnCloudinary = async(localFilePath) => {
 
 
         const response = await cloudinary.uploader.upload(localFilePath,{
-            resource_type:"auto"
+            resource_type: "image",
+            folder: folderName
         })
 
         if(!response){
@@ -31,6 +32,7 @@ export const uploadOnCloudinary = async(localFilePath) => {
 
     }catch(error){
         fs.unlinkSync(localFilePath)
+        console.error("Cloudinary Upload Error:", error);
         return null;
     }
 }
