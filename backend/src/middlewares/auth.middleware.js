@@ -52,7 +52,25 @@ export const verifyJWT = asyncHandler(async(req,res,next)=>{
         });
 
     }
-})
+});
+
+/*
+Role-Based Authorization Middleware (Optional Helper)
+To restrict certain actions (like approving diagnostic reports or deleting records) to verified doctors or admins, append this helper in the same file:
+ */
+
+
+export const authorizeRoles = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Role (${req.user?.role}) is not authorized.`
+      });
+    }
+    next();
+  };
+};
 
 
 
