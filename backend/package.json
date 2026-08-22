@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --experimental-json-modules src/server.js",
+    "dev": "nodemon dotenv/config --experimental-json-modules src/index.js",
     "start": "node -r dotenv/config src/index.js"
   },
   "keywords": [],
@@ -17,9 +17,12 @@
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.9.3"
+    "mongoose": "^9.9.3",
+    "multer": "^2.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

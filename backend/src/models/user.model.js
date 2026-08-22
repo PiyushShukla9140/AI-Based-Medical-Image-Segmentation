@@ -38,14 +38,19 @@ const userSchema = new mongoose.Schema({
     },
     profileImage:{
         type:String,
+    },
+    refreshToken:{
+        type:String
     }
 },{timestamps:{createdAt:true , updatedAt:true}})
 
 // if you want to write some functions associated with this schema you can write here
-userSchema.pre("save",async()=>{
+userSchema.pre("save",async function(){
     if(!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password,10);
-})
+})// earlier i was using arrow funciton syntax here and it was gvivng error because arrow function 
+/*In JavaScript, arrow functions do not bind their own this. In Mongoose pre-save middleware, this refers to the document being saved. Because an arrow function was used, this is undefined, causing this.isModified to crash. */
+
 
 // Compare password method
 userSchema.methods.isPasswordCorrect = async function (enteredPassword) {
@@ -60,8 +65,8 @@ userSchema.methods.generateAccessToken = function () {
             email: this.email,
             role: this.role
         },
-        process.env.ACCESS_TOKEN_SECRET|| "default_jwt_secret_key",
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "7d" }
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     );
 };
 

@@ -1,17 +1,21 @@
 import {v2 as cloudinary} from "cloudinary"
 import fs from "fs"
-import ApiError from "./apiError.js"
+import {ApiError} from "./apiError.js"
 
 
-// Configuration
+
+//Configuration
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
     api_key: process.env.CLOUDINARY_API_KEY, 
     api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
+    
 });
 
 
-export const uploadOnCloudinary = async(localFilePath,folderName = "medical_scans") => {
+
+
+export const uploadOnCloudinary = async(localFilePath) => {
     try{
         if(!localFilePath){
             throw new ApiError(404,"File not found on local server");
@@ -19,20 +23,17 @@ export const uploadOnCloudinary = async(localFilePath,folderName = "medical_scan
 
 
         const response = await cloudinary.uploader.upload(localFilePath,{
-            resource_type: "image",
-            folder: folderName
+            resource_type: "auto",
         })
 
-        if(!response){
-            throw new ApiError(500,"Error while uploading file on cloudinary.");
-        }
 
         fs.unlinkSync(localFilePath)
         return response
 
     }catch(error){
-        fs.unlinkSync(localFilePath)
-        console.error("Cloudinary Upload Error:", error);
+        
+        fs.unlinkSync(localFilePath) 
+        console.error("Cloudinary upload error: ",error);
         return null;
     }
 }
@@ -42,7 +43,7 @@ export const deleteFromCloudinary = async(cloudinaryURL)=>{
     try{
         if(!cloudinaryURL) return null
 
-        const publicIDwithExtension =  cloudinaryUrl.split("/").pop();
+        const publicIDwithExtension =  cloudinaryURL.split("/").pop();
 
         const publicId = publicIDwithExtension.split(".")[0]
 

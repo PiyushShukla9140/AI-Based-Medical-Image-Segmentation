@@ -1,4 +1,4 @@
-import { trusted } from "mongoose";
+import mongoose from "mongoose";
 import {User} from "../models/user.model.js"
 import {ApiError} from "../util/apiError.js"
 import {ApiResponse} from "../util/apiResponse.js"
@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req,res)=>{
     // Step 8) return res
 
 
-    const {username,email,password,fullName,role,spicialization} = req.body;
+    const {username,email,password,fullName,role,specialization} = req.body;
 
     if([username,email,password,fullName].some((field)=>field.trim==="")){
         throw new ApiError(404,"User related fileds are required");
@@ -48,8 +48,8 @@ const registerUser = asyncHandler(async (req,res)=>{
     }
 
     let profileImageLocalPath;
-    if(req.files && Array.isArray(req.files.profileImage) && req.files.coverImage.length>0){
-        profileImageLocalPath = req.files.coverImage[0].path
+    if(req.files && Array.isArray(req.files.profileImage) && req.files.profileImage.length>0){
+        profileImageLocalPath = req.files.profileImage[0].path
     }
 
     // As profile image is not required field we are not returning any api error 
@@ -91,17 +91,18 @@ const generateAccessandRefreshToken = async(userId)=>{
 
     try{
         if(!userId){
-        throw new ApiError(400,"Invalid userId");
-    }
+            throw new ApiError(400,"Invalid userId");
+        }
 
-    const user = user.findById(userId);
+    const user = await User.findById(userId);
 
-    const accessToken = await User.generateAccessToken();
-    const refreshToken = await User.generateRefreshToken();
+    const accessToken = await user.generateAccessToken();
+
+    const refreshToken = await user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
 
-    await User.save({validateBeforeSave:false})
+    await user.save({validateBeforeSave:false})
 
     return {accessToken,refreshToken}
     }catch(error){
@@ -121,7 +122,7 @@ const userLogin = asyncHandler(async(req,res)=>{
 
     const {username,email,password} = req.body;
 
-    if(!(username||email)||password){
+    if(!(username||email)||!password){
         throw new ApiError(404,"Username or password required");
     }
 
@@ -160,7 +161,7 @@ const userLogin = asyncHandler(async(req,res)=>{
 
 });
 const userLogout = asyncHandler(async(req,res)=>{
-    const user = await User.findByIdAndUpdate(req.user._id,{
+    await User.findByIdAndUpdate(req.user?._id,{
         $unset:{
             refreshToken:1 // this removes the field from the document
         }
@@ -168,8 +169,8 @@ const userLogout = asyncHandler(async(req,res)=>{
 
 
     return res.status(200)
-    .clearCookie(accessToken,cookieOptions)
-    .clearCookie(refreshToken,cookieOptions)
+    .clearCookie("accessToken",cookieOptions)
+    .clearCookie("refreshToken",cookieOptions)
     .json(new ApiResponse(200,{},"User logged out successfully"));
 });
 
@@ -224,7 +225,7 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,req.user,"User details fetched successfully"));
 })
 
-const changeCurrentPassword = asyncHandler(async(res,req)=>{
+const changeCurrentPassword = asyncHandler(async(req,res)=>{
 
     // Step 1: Recieve the oldPassword and newPassword from the user 
     // Step 2: find the user using req.user
@@ -278,7 +279,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
             $or:
                 [
                     {email},
-                    {username:username.toLowercase()}
+                    {username:username.toLowerCase()}
                 ],
             _id:{
                 $ne:req.user._id
@@ -292,7 +293,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
             throw new ApiError(409,"Email is already in use");
         }
 
-        if(userExists.username === username.toLowercase()){
+        if(userExists.username === username.toLowerCase()){
             throw new ApiError(409,"Username is already in use");
         }
     }
@@ -369,9 +370,9 @@ const updateProfileImage = asyncHandler(async(req,res)=>{
 
     const user = await User.findByIdAndUpdate(req.user?._id,{
         $set:{
-            profileImage:newProfileImage.url()
+            profileImage:newProfileImage.url
         }
-    },{new:true}).select("-password refreshToken")
+    },{new:true}).select(" -password -refreshToken")
 
     if(!user){
         throw new ApiError(500,"Error while storing the refrence(url) of the new profile image in database");
@@ -414,7 +415,7 @@ const uploadProfileImage = asyncHandler(async(req,res)=>{
 
     const user = await User.findByIdAndUpdate(req.user?._id,{
         $set:{
-            profileImage:profileImage.url()
+            profileImage:profileImage.url
         }
     },{new:true}).select(" -password -refreshToken")
 
@@ -424,6 +425,12 @@ const uploadProfileImage = asyncHandler(async(req,res)=>{
 
     return res.status(200)
     .json(new ApiResponse(200,"Profile Image uploaded successfully"))
+})
+
+
+const getUserPatientsProfile = asyncHandler(async(req,res)=>{
+    const userId = req.user._id;
+        
 })
 
 
