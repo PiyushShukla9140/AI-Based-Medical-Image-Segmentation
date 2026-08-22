@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema({
     specialization:{
         type:String,
         default:"radiology"
+    },
+    profileImage:{
+        type:String,
     }
 },{timestamps:{createdAt:true , updatedAt:true}})
 
