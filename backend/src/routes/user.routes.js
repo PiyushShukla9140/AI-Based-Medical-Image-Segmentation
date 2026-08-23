@@ -12,7 +12,9 @@ import {registerUser,
     updateAccountDetails,
     deleteProfileImage,
     updateProfileImage,
-    uploadProfileImage,} from "../controllers/user.controller.js"
+    uploadProfileImage,
+    getUserPatientsProfile
+} from "../controllers/user.controller.js"
 
 const router = Router();
 
@@ -30,5 +32,6 @@ router.route("/update-account").patch(verifyJWT, updateAccountDetails)
 router.route("/upload-profileImage").post(verifyJWT,upload.single("profileImage"),uploadProfileImage);
 router.route("/update-profileImage").patch(verifyJWT,upload.single("profileImage"),updateProfileImage)
 router.route("/delete-profileImage").delete(verifyJWT,deleteProfileImage)
+router.get("/patients-profile", verifyJWT, getUserPatientsProfile);
 
 export default router

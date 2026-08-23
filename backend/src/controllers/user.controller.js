@@ -430,6 +430,70 @@ const uploadProfileImage = asyncHandler(async(req,res)=>{
 
 const getUserPatientsProfile = asyncHandler(async(req,res)=>{
     const userId = req.user._id;
+
+    const userPatintProfile = await User.aggregate([{
+        $match:{
+            _id:mongoose.Types.ObjectId(userId)
+        }
+    },
+    {
+        $lookup:{
+            from:"patients",
+            localField:"_id",
+            foriegField:"doctorId",
+            as:"patients",
+            pipeline:[
+                // Nested lookup to fetch medical scans for each patient
+                {
+                    $lookup: {
+                        from: "medicalscans",
+                        localField: "_id",
+                        foreignField: "patientId",
+                        as: "scans",
+                        pipeline: [
+                            {
+                                $project: {
+                                    scanType: 1,
+                                    bodyPart: 1,
+                                    imageUrl: 1,
+                                    status: 1,
+                                    "analysis.overallFindings": 1,
+                                    "analysis.severityLevel": 1,
+                                    createdAt: 1
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $addFields: {
+                        totalScans: { $size: "$scans" }
+                    }
+                }
+            ]
+
+        }
+    },
+    // 3. Compute summary statistics
+    {
+      $addFields: {
+        totalPatients: { $size: "$patients" }
+      }
+    },
+
+    // 4. Project clean output schema
+    {
+      $project: {
+        fullName: 1,
+        email: 1,
+        role: 1,
+        specialization: 1,
+        profileImage: 1,
+        totalPatients: 1,
+        patients: 1
+      }
+    }
+])
         
 })
 
@@ -455,4 +519,5 @@ export {
     deleteProfileImage,
     updateProfileImage,
     uploadProfileImage,
+    getUserPatientsProfile
 }

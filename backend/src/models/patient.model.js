@@ -6,7 +6,7 @@ const patientSchema = new Schema({
         required:[true,"Patient name is required"],
         trim:true
     },
-    doctor:{
+    doctorId:{
         type: Schema.Types.ObjectId,
         ref:"User",
         required:true
@@ -25,7 +25,7 @@ const patientSchema = new Schema({
         type: String,
         default: ""
     },
-    contact:{
+    contactNumber:{
         type: String,
         default: ""
     }
