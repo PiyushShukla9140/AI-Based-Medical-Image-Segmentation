@@ -30,8 +30,16 @@ app.use(cookieParser());
 
 import userRoutes from "./routes/user.routes.js"
 import patientRoutes from "./routes/patient.routes.js"
+import scanRoutes from "./routes/medicalScan.routes.js"
+import reportRoutes from "./routes/report.routes.js"
+import dashboardRoutes from "./routes/dashboard.routes.js";
+
 app.use("/api/v1/users",userRoutes)
 app.use("/api/v1/patient",patientRoutes)
+app.use("/api/v1/scans", scanRoutes)
+app.use("/api/v1/report",reportRoutes)
+app.use("/api/v1/dashboard", dashboardRoutes);
+
 
 
 app.get("/healthcheck",(req,res)=>{
