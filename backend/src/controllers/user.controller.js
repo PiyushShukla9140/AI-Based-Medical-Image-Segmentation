@@ -429,72 +429,84 @@ const uploadProfileImage = asyncHandler(async(req,res)=>{
 
 
 const getUserPatientsProfile = asyncHandler(async(req,res)=>{
+    console.log(">>> getUserPatientsProfile hit! Logged in user:", req.user?._id)
     const userId = req.user._id;
 
-    const userPatintProfile = await User.aggregate([{
-        $match:{
-            _id:mongoose.Types.ObjectId(userId)
-        }
-    },
-    {
-        $lookup:{
-            from:"patients",
-            localField:"_id",
-            foriegField:"doctorId",
-            as:"patients",
-            pipeline:[
-                // Nested lookup to fetch medical scans for each patient
-                {
-                    $lookup: {
-                        from: "medicalscans",
-                        localField: "_id",
-                        foreignField: "patientId",
-                        as: "scans",
-                        pipeline: [
-                            {
-                                $project: {
-                                    scanType: 1,
-                                    bodyPart: 1,
-                                    imageUrl: 1,
-                                    status: 1,
-                                    "analysis.overallFindings": 1,
-                                    "analysis.severityLevel": 1,
-                                    createdAt: 1
+    const userPateintProfile = await User.aggregate([{
+            $match:{
+                _id: new mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $lookup:{
+                from:"patients",
+                localField:"_id",
+                foreignField:"doctorId",
+                as:"patients",
+                pipeline:[
+                    // Nested lookup to fetch medical scans for each patient
+                    {
+                        $lookup: {
+                            from: "medicalscans",
+                            localField: "_id",
+                            foreignField: "patientId",
+                            as: "scans",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        scanType: 1,
+                                        bodyPart: 1,
+                                        imageUrl: 1,
+                                        status: 1,
+                                        "analysis.overallFindings": 1,
+                                        "analysis.severityLevel": 1,
+                                        createdAt: 1
+                                    }
                                 }
-                            }
-                        ]
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            totalScans: { $size: "$scans" }
+                        }
                     }
-                },
-                {
-                    $addFields: {
-                        totalScans: { $size: "$scans" }
-                    }
-                }
-            ]
+                ]
 
+            }
+        },
+        // 3. Compute summary statistics
+        {
+            $addFields: {
+                totalPatients: { $size: "$patients" }
+            }
+        },
+
+        // 4. Project clean output schema
+        {
+            $project: {
+                fullName: 1,
+                email: 1,
+                role: 1,
+                specialization: 1,
+                profileImage: 1,
+                totalPatients: 1,
+                patients: 1
+            }
         }
-    },
-    // 3. Compute summary statistics
-    {
-      $addFields: {
-        totalPatients: { $size: "$patients" }
-      }
-    },
+    ]);
 
-    // 4. Project clean output schema
-    {
-      $project: {
-        fullName: 1,
-        email: 1,
-        role: 1,
-        specialization: 1,
-        profileImage: 1,
-        totalPatients: 1,
-        patients: 1
-      }
+    if (!userPateintProfile || userPateintProfile.length === 0) {
+        throw new ApiError(404, "User profile not found");
     }
-])
-        
+
+    return res.status(200).json(
+        new ApiResponse(
+        200,
+        userPateintProfile[0],
+        "Doctor patients profile fetched successfully"
+        )
+    );    
 })
 
 

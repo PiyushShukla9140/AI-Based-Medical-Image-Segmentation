@@ -11,10 +11,10 @@ const aiAnalysisSchema = new mongoose.Schema(
       enum: ["Normal", "Low", "Moderate", "High"],
       default: "Normal"
     },
-    detectedRegions: {
+    detectedRegions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref:"DetectedRegion"
-    },
+    }],// because gemini will be giving multipe regions therefore hold it in array
     rawApiResponse: {
       type: mongoose.Schema.Types.Mixed
       // we have used mixed here so that mongoose can accept any kind of data without specifyning specialized schema

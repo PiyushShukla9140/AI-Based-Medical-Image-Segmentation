@@ -11,7 +11,7 @@ const router = Router();
 
 router.use(verifyJWT);
 
-router.route("/")
+router.route("/create-report")
   .post(authorizeRoles("doctor", "radiologist", "admin"), createReport);
 
 router.route("/:id")

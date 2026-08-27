@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import fs from "fs";
 
 // Initialize Gemini Client
@@ -11,7 +11,7 @@ const fileToGenerativePart = (filePath, mimeType) => {
   return {
     inlineData: {
       data: fs.readFileSync(filePath).toString("base64"),
-      mimeType
+      mimeType: mimeType || "image/jpeg"
     }
   };
 };
@@ -23,77 +23,75 @@ const fileToGenerativePart = (filePath, mimeType) => {
  * @param {string} scanType - Modality (e.g., 'Chest X-Ray', 'Brain MRI')
  */
 export const analyzeMedicalImageWithGemini = async (
-  localFilePath,
-  mimeType,
-  scanType = "Chest X-Ray"
-) => {
-  try {
-    const imagePart = fileToGenerativePart(localFilePath, mimeType);
+    localFilePath,
+    mimeType,
+    scanType = "Chest X-Ray"
+  ) => {
+    try {
+      const imagePart = fileToGenerativePart(localFilePath, mimeType);
 
-    const prompt = `
-You are an expert AI radiology and medical imaging assistant.
-Analyze this medical scan of type: "${scanType}".
+      const prompt = `
+  You are an expert AI radiology and medical imaging assistant.
+  Analyze this medical scan of type: "${scanType}".
 
-Detect and locate any abnormalities, pathologies, lesions, consolidations, or fractures.
-For every abnormality detected:
-1. Provide a precise 2D bounding box normalized on a 0 to 1000 scale: [ymin, xmin, ymax, xmax].
-2. Assign a clinical label and category.
-3. Add a concise clinical note.
+  Detect and locate any visible abnormalities, pathologies, lesions, consolidations, or fractures.
+  For every abnormality detected:
+  1. Provide a precise 2D bounding box normalized on a 0 to 1000 scale: { ymin, xmin, ymax, xmax }.
+  2. Assign a clinical label and category.
+  3. Add a concise clinical note and confidence score (0 to 1).
 
-Provide an overall clinical summary of findings and assign a severity level ('Normal', 'Low', 'Moderate', or 'High').
-`;
+  Provide an overall clinical summary of findings and assign a severity level ('Normal', 'Low', 'Moderate', or 'High').
+  `;
 
-    // Call Gemini 2.5 Flash with structured JSON output enforcement
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [imagePart, prompt],
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "OBJECT",
-          properties: {
-            overallFindings: {
-              type: "STRING",
-              description: "Concise clinical summary of observations"
-            },
-            severityLevel: {
-              type: "STRING",
-              enum: ["Normal", "Low", "Moderate", "High"]
-            },
-            detectedRegions: {
-              type: "ARRAY",
-              items: {
-                type: "OBJECT",
-                properties: {
-                  label: { type: "STRING" },
-                  category: { type: "STRING" },
-                  confidenceScore: { type: "NUMBER" },
-                  box2d: {
-                    type: "OBJECT",
-                    properties: {
-                      ymin: { type: "NUMBER" },
-                      xmin: { type: "NUMBER" },
-                      ymax: { type: "NUMBER" },
-                      xmax: { type: "NUMBER" }
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [imagePart, prompt],
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              overallFindings: {
+                type: Type.STRING,
+                description: "Concise clinical summary of observations"
+              },
+              severityLevel: {
+                type: Type.STRING,
+                enum: ["Normal", "Low", "Moderate", "High"]
+              },
+              detectedRegions: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    label: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                    confidenceScore: { type: Type.NUMBER },
+                    box2d: {
+                      type: Type.OBJECT,
+                      properties: {
+                        ymin: { type: Type.NUMBER },
+                        xmin: { type: Type.NUMBER },
+                        ymax: { type: Type.NUMBER },
+                        xmax: { type: Type.NUMBER }
+                      },
+                      required: ["ymin", "xmin", "ymax", "xmax"]
                     },
-                    required: ["ymin", "xmin", "ymax", "xmax"]
+                    clinicalNote: { type: Type.STRING }
                   },
-                  clinicalNote: { type: "STRING" }
-                },
-                required: ["label", "box2d"]
+                  required: ["label", "box2d"]
+                }
               }
-            }
-          },
-          required: ["overallFindings", "severityLevel", "detectedRegions"]
+            },
+            required: ["overallFindings", "severityLevel", "detectedRegions"]
+          }
         }
-      }
-    });
+      });
 
-    // Parse verified JSON output
-    const resultJson = JSON.parse(response.text.trim());
-    return resultJson;
-  } catch (error) {
-    console.error("Gemini Vision API Error:", error);
-    throw new Error(`AI Analysis failed: ${error.message}`);
-  }
+      const resultJson = JSON.parse(response.text.trim());
+      return resultJson;
+    } catch (error) {
+      console.error("Gemini Vision API Error:", error);
+      throw new Error(`AI Analysis failed: ${error.message}`);
+    }
 };

@@ -4,7 +4,7 @@ import {
   getScanById,
   verifyDetectedRegion,
   deleteScan
-} from "../controllers/scan.controller.js";
+} from "../controllers/medicalScan.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 

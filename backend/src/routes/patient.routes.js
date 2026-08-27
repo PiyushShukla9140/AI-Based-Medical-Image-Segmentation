@@ -13,13 +13,17 @@ const router = Router();
 // Protect all patient endpoints
 router.use(verifyJWT);
 
-router.route("/")
-  .post(createPatient)
-  .get(getDoctorPatients);
+router.route("/create-Patient")
+  .post(createPatient);
 
-router.route("/:id")
+router.route("/get-Doctor-Patient").get(getDoctorPatients);
+  
+
+router.route("/:id/get-Patient")
   .get(getPatientById)
-  .patch(updatePatient)
-  .delete(deletePatient);
+
+  router.route("/:id/update-Patient").patch(updatePatient);
+
+  router.route("/:id/delete-Patient").delete(deletePatient)
 
 export default router;

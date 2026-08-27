@@ -27,7 +27,7 @@ const createPatient = asyncHandler(async(req,res)=>{
 
     const patient = await Patient.create({
         doctorId:req.user._id,
-        patientName: patientName.trim(),
+        name: name.trim(),
         age: Number(age),
         gender,
         contactNumber: contactNumber || "",
@@ -67,7 +67,11 @@ const getDoctorPatients = asyncHandler(async(req,res)=>{
 
 // get single patient details + all associated medical scans
 const getPatientById = asyncHandler(async(req,res)=>{
-    const {id} = req.parmas;
+    const {id} = req.params;
+
+    if(!id){
+        throw new ApiError(404,"Patient id is required")
+    }
 
     const patient = await Patient.findOne({
         _id: id,
