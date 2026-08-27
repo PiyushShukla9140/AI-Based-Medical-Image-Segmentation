@@ -13,7 +13,7 @@ const medicalScanSchema = new mongoose.Schema(
     },
     scanType: {
       type: String,
-      enum: ["Chest X-Ray", "Brain MRI", "CT Scan", "Skin Lesion", "Other"],
+      enum: ["Chest X-Ray", "Brain MRI", "CT Scan", "Skin Lesion", "Other","Hips X-Ray"],
       required: true
     },
     bodyPart: {
