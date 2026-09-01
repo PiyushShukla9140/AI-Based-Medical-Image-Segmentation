@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 import { DB_NAME } from "../constant.js";
 
 const dbConnect = async()=>{
@@ -11,5 +12,4 @@ const dbConnect = async()=>{
 
     }
 }
-
 export default dbConnect;
