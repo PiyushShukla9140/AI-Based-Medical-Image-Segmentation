@@ -4,16 +4,8 @@ import ViewerToolbar from "./ViewerToolbar";
 import DetectionOverlay from "./DetectionOverlay";
 import useViewerStore from "../../stores/viewerStore";
 
-const MedicalImageViewer = ({
-  imageUrl,
-  regions = [],
-}) => {
+const MedicalImageViewer = ({ imageUrl, regions = [] }) => {
   const imageRef = useRef(null);
-
-  const [imageSize, setImageSize] = useState({
-    width: 0,
-    height: 0,
-  });
 
   const {
     zoom,
@@ -26,13 +18,17 @@ const MedicalImageViewer = ({
     selectRegion,
   } = useViewerStore();
 
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
   const [position, setPosition] = useState({
     x: 0,
     y: 0,
   });
 
-  const [isDragging, setIsDragging] =
-    useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const dragStart = useRef({
     x: 0,
@@ -44,18 +40,35 @@ const MedicalImageViewer = ({
       x: 0,
       y: 0,
     });
+
+    setImageDimensions({
+      width: 0,
+      height: 0,
+    });
   }, [imageUrl]);
 
-  const handleImageLoad = () => {
+  const updateImageDimensions = () => {
     if (!imageRef.current) {
       return;
     }
 
-    setImageSize({
-      width: imageRef.current.naturalWidth,
-      height: imageRef.current.naturalHeight,
+    setImageDimensions({
+      width: imageRef.current.clientWidth,
+      height: imageRef.current.clientHeight,
     });
   };
+
+  const handleImageLoad = () => {
+    updateImageDimensions();
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", updateImageDimensions);
+
+    return () => {
+      window.removeEventListener("resize", updateImageDimensions);
+    };
+  }, []);
 
   const handleMouseDown = (event) => {
     if (zoom <= 1) {
@@ -106,12 +119,8 @@ const MedicalImageViewer = ({
       />
 
       <div
-        className={`relative flex h-[650px] items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-black ${
-          zoom > 1
-            ? isDragging
-              ? "cursor-grabbing"
-              : "cursor-grab"
-            : ""
+        className={`relative flex h-[650px] items-center justify-center overflow-hidden rounded-2xl border border-neutral-800 bg-[#0b0908] ${
+          zoom > 1 ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
         }`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -119,7 +128,7 @@ const MedicalImageViewer = ({
         onMouseLeave={handleMouseUp}
       >
         <div
-          className="relative select-none"
+          className="relative"
           style={{
             transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
             transformOrigin: "center center",
@@ -135,12 +144,11 @@ const MedicalImageViewer = ({
           />
 
           {showOverlay &&
-            imageSize.width > 0 &&
-            imageSize.height > 0 && (
+            regions.length > 0 &&
+            imageDimensions.width > 0 &&
+            imageDimensions.height > 0 && (
               <DetectionOverlay
                 regions={regions}
-                imageWidth={imageSize.width}
-                imageHeight={imageSize.height}
                 selectedRegion={selectedRegion}
                 onSelectRegion={selectRegion}
               />

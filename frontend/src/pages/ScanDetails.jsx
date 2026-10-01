@@ -7,25 +7,11 @@ function ScanDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const scan = useScanStore(
-    (state) => state.selectedScan
-  );
-
-  const isLoading = useScanStore(
-    (state) => state.isLoading
-  );
-
-  const error = useScanStore(
-    (state) => state.error
-  );
-
-  const fetchScan = useScanStore(
-    (state) => state.fetchScan
-  );
-
-  const removeScan = useScanStore(
-    (state) => state.removeScan
-  );
+  const scan = useScanStore((state) => state.selectedScan);
+  const isLoading = useScanStore((state) => state.isLoading);
+  const error = useScanStore((state) => state.error);
+  const fetchScan = useScanStore((state) => state.fetchScan);
+  const removeScan = useScanStore((state) => state.removeScan);
 
   useEffect(() => {
     fetchScan(id);
@@ -33,7 +19,7 @@ function ScanDetails() {
 
   const handleDelete = async (scanId) => {
     const confirmed = window.confirm(
-      "Delete this scan and its associated AI analysis?"
+      "Delete this scan and its associated AI analysis?",
     );
 
     if (!confirmed) {
@@ -46,15 +32,15 @@ function ScanDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-blue-500" />
+      <div className="flex min-h-[400px] items-center justify-center bg-[#0b0908]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-700 border-t-orange-500 shadow-lg shadow-orange-500/20" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-900/50 bg-red-950/30 p-5 text-red-400">
+      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-5 text-red-400">
         {error}
       </div>
     );

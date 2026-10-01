@@ -140,7 +140,7 @@ const uploadAndAnalyzeScan = asyncHandler(async (req, res) => {
         path: "detectedRegions",
       },
     })
-    .populate("patientId", "patientName age gender")
+    .populate("patientId", "name age gender contactNumber")
     .populate("uploadedBy", "fullName email role specialization");
 
   return res
@@ -158,6 +158,7 @@ const uploadAndAnalyzeScan = asyncHandler(async (req, res) => {
 const getScanById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
+  
   const scan = await MedicalScan.findById(id)
     .populate({
       path: "analysis",

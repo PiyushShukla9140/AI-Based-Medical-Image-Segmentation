@@ -26,14 +26,15 @@ api.interceptors.response.use(
 
       try {
         await api.post("/users/refresh-token");
+
         return api(originalRequest);
-      } catch {
-        return Promise.reject(error);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

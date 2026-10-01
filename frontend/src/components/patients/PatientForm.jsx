@@ -9,12 +9,7 @@ const initialForm = {
   medicalNotes: "",
 };
 
-function PatientForm({
-  patient,
-  onSubmit,
-  onClose,
-  isSubmitting,
-}) {
+function PatientForm({ patient, onSubmit, onClose, isSubmitting }) {
   const [form, setForm] = useState(initialForm);
 
   useEffect(() => {
@@ -54,14 +49,14 @@ function PatientForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+      <div className="w-full max-w-lg rounded-2xl border border-neutral-800 bg-[#100d0b] p-6 shadow-2xl shadow-black/40">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white">
               {patient ? "Edit Patient" : "Add Patient"}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-neutral-500">
               {patient
                 ? "Update patient information"
                 : "Create a new patient profile"}
@@ -69,8 +64,9 @@ function PatientForm({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
+            className="rounded-lg p-2 text-neutral-400 transition hover:bg-orange-500/10 hover:text-orange-400"
           >
             <X size={20} />
           </button>
@@ -78,7 +74,7 @@ function PatientForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Patient Name
             </label>
 
@@ -87,16 +83,14 @@ function PatientForm({
               value={form.name}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+              className="w-full rounded-xl border border-neutral-800 bg-[#0b0908] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
               placeholder="Enter patient name"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-2 block text-sm text-slate-300">
-                Age
-              </label>
+              <label className="mb-2 block text-sm text-neutral-300">Age</label>
 
               <input
                 name="age"
@@ -105,13 +99,13 @@ function PatientForm({
                 value={form.age}
                 onChange={handleChange}
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                className="w-full rounded-xl border border-neutral-800 bg-[#0b0908] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
                 placeholder="Age"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-slate-300">
+              <label className="mb-2 block text-sm text-neutral-300">
                 Gender
               </label>
 
@@ -120,7 +114,7 @@ function PatientForm({
                 value={form.gender}
                 onChange={handleChange}
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                className="w-full rounded-xl border border-neutral-800 bg-[#0b0908] px-4 py-3 text-white outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
               >
                 <option value="">Select</option>
                 <option value="Male">Male</option>
@@ -131,7 +125,7 @@ function PatientForm({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Contact Number
             </label>
 
@@ -139,13 +133,13 @@ function PatientForm({
               name="contactNumber"
               value={form.contactNumber}
               onChange={handleChange}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+              className="w-full rounded-xl border border-neutral-800 bg-[#0b0908] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
               placeholder="Enter contact number"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Medical Notes
             </label>
 
@@ -154,7 +148,7 @@ function PatientForm({
               value={form.medicalNotes}
               onChange={handleChange}
               rows="4"
-              className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+              className="w-full resize-none rounded-xl border border-neutral-800 bg-[#0b0908] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
               placeholder="Enter medical notes"
             />
           </div>
@@ -163,7 +157,7 @@ function PatientForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-700 px-4 py-3 font-medium text-slate-300 hover:bg-slate-800"
+              className="flex-1 rounded-xl border border-neutral-800 px-4 py-3 font-medium text-neutral-300 transition hover:border-orange-500/30 hover:bg-orange-500/5 hover:text-white"
             >
               Cancel
             </button>
@@ -171,7 +165,7 @@ function PatientForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-xl bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-xl bg-orange-500 px-4 py-3 font-medium text-black shadow-lg shadow-orange-500/10 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
                 ? "Saving..."

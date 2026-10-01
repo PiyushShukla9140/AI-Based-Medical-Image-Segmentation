@@ -1,37 +1,23 @@
 import { useEffect, useState } from "react";
-import {
-  CheckCircle2,
-  LoaderCircle,
-} from "lucide-react";
+import { CheckCircle2, LoaderCircle } from "lucide-react";
 
 import RegionStatus from "./RegionStatus";
 import useAIStore from "../../stores/aiStore";
-import {
-  formatConfidence,
-  getRegionLabel,
-} from "../../utils/aiHelpers";
+import { formatConfidence, getRegionLabel } from "../../utils/aiHelpers";
 
-const RegionVerificationForm = ({
-  region,
-}) => {
-  const {
-    verifyRegion,
-    isVerifying,
-  } = useAIStore();
+const RegionVerificationForm = ({ region }) => {
+  const { verifyRegion, isVerifying } = useAIStore();
 
-  const [feedback, setFeedback] =
-    useState("");
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    setFeedback(
-      region?.doctorFeedback || ""
-    );
+    setFeedback(region?.doctorFeedback || "");
   }, [region]);
 
   if (!region) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-2xl border border-neutral-800 bg-[#100d0b] p-6">
+        <p className="text-sm text-neutral-500">
           Select a detected region to review.
         </p>
       </div>
@@ -46,10 +32,10 @@ const RegionVerificationForm = ({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <div className="rounded-2xl border border-neutral-800 bg-[#100d0b] p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wider text-slate-500">
+          <p className="text-xs uppercase tracking-wider text-neutral-500">
             Selected Region
           </p>
 
@@ -58,76 +44,58 @@ const RegionVerificationForm = ({
           </h2>
         </div>
 
-        <RegionStatus
-          verified={region.isDoctorVerified}
-        />
+        <RegionStatus verified={region.isDoctorVerified} />
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl bg-slate-950 p-4">
-          <p className="text-xs text-slate-500">
-            Category
-          </p>
+        <div className="rounded-xl bg-[#0b0908] p-4">
+          <p className="text-xs text-neutral-500">Category</p>
 
           <p className="mt-1 text-sm text-white">
             {region.category || "Anomaly"}
           </p>
         </div>
 
-        <div className="rounded-xl bg-slate-950 p-4">
-          <p className="text-xs text-slate-500">
-            Confidence
-          </p>
+        <div className="rounded-xl bg-[#0b0908] p-4">
+          <p className="text-xs text-neutral-500">Confidence</p>
 
           <p className="mt-1 text-sm text-white">
-            {formatConfidence(
-              region.confidenceScore
-            )}
+            {formatConfidence(region.confidenceScore)}
           </p>
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl bg-slate-950 p-4">
-        <p className="text-xs text-slate-500">
-          AI Clinical Note
-        </p>
+      <div className="mt-5 rounded-xl bg-[#0b0908] p-4">
+        <p className="text-xs text-neutral-500">AI Clinical Note</p>
 
-        <p className="mt-2 text-sm leading-6 text-slate-300">
-          {region.clinicalNote ||
-            "No clinical note available."}
+        <p className="mt-2 text-sm leading-6 text-neutral-300">
+          {region.clinicalNote || "No clinical note available."}
         </p>
       </div>
 
       <div className="mt-5">
-        <label className="mb-2 block text-sm font-medium text-slate-300">
+        <label className="mb-2 block text-sm font-medium text-neutral-300">
           Doctor Feedback
         </label>
 
         <textarea
           value={feedback}
-          onChange={(event) =>
-            setFeedback(event.target.value)
-          }
+          onChange={(event) => setFeedback(event.target.value)}
           rows={5}
           placeholder="Add clinical feedback..."
-          className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
+          className="w-full resize-none rounded-xl border border-neutral-800 bg-[#0b0908] p-4 text-sm text-white outline-none placeholder:text-neutral-600 transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
         />
       </div>
 
       <button
+        type="button"
         onClick={handleVerify}
-        disabled={
-          isVerifying ||
-          region.isDoctorVerified
-        }
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+        disabled={isVerifying || region.isDoctorVerified}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-medium text-black shadow-lg shadow-orange-500/10 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isVerifying ? (
           <>
-            <LoaderCircle
-              size={17}
-              className="animate-spin"
-            />
+            <LoaderCircle size={17} className="animate-spin" />
             Verifying...
           </>
         ) : region.isDoctorVerified ? (

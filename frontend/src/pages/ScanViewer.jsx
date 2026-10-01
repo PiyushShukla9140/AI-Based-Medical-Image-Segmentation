@@ -1,47 +1,29 @@
 import { useEffect } from "react";
-import {
-  ArrowLeft,
-  LoaderCircle,
-} from "lucide-react";
-import {
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import MedicalImageViewer from "../components/viewer/MedicalImageViewer";
 import DetectionSidebar from "../components/viewer/DetectionSidebar";
 import useViewerStore from "../stores/viewerStore";
 
-const ScanViewer = () => {
+function ScanViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const {
-    scan,
-    isLoading,
-    error,
-    fetchScan,
-    resetViewer,
-  } = useViewerStore();
+  const { scan, isLoading, error, fetchScan } = useViewerStore();
 
   useEffect(() => {
-    resetViewer();
-    fetchScan(id);
-
-    return () => {
-      resetViewer();
-    };
-  }, [id, fetchScan, resetViewer]);
+    if (id) {
+      fetchScan(id);
+    }
+  }, [id, fetchScan]);
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-400">
-          <LoaderCircle
-            size={20}
-            className="animate-spin"
-          />
-          Loading medical scan...
+      <div className="flex min-h-[70vh] items-center justify-center bg-[#0b0908] text-neutral-400">
+        <div className="flex items-center gap-3">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-700 border-t-orange-500 shadow-lg shadow-orange-500/20" />
+          Loading medical image...
         </div>
       </div>
     );
@@ -57,49 +39,40 @@ const ScanViewer = () => {
 
   if (!scan) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+      <div className="rounded-2xl border border-neutral-800 bg-[#100d0b] p-6 text-neutral-400">
         Scan not found.
       </div>
     );
   }
 
-  const regions =
-    scan.analysis?.detectedRegions || [];
+  const regions = scan.analysis?.detectedRegions || [];
 
   return (
     <div className="space-y-6">
       <button
-        onClick={() =>
-          navigate(`/scans/${scan._id}`)
-        }
-        className="flex items-center gap-2 text-sm text-slate-400 hover:text-white"
+        type="button"
+        onClick={() => navigate(`/scans/${scan._id}`)}
+        className="flex items-center gap-2 text-sm text-neutral-400 transition hover:text-orange-400"
       >
         <ArrowLeft size={17} />
         Back to Scan Details
       </button>
 
       <div>
-        <h1 className="text-2xl font-semibold text-white">
-          Medical Image Viewer
-        </h1>
+        <h1 className="text-2xl font-bold text-white">Medical Image Viewer</h1>
 
-        <p className="mt-1 text-sm text-slate-400">
-          {scan.scanType} · {scan.bodyPart}
+        <p className="mt-1 text-sm text-neutral-500">
+          {scan.scanType} · {scan.bodyPart || "General"}
         </p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <MedicalImageViewer
-          imageUrl={scan.imageUrl}
-          regions={regions}
-        />
+      <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+        <MedicalImageViewer imageUrl={scan.imageUrl} regions={regions} />
 
-        <DetectionSidebar
-          regions={regions}
-        />
+        <DetectionSidebar regions={regions} />
       </div>
     </div>
   );
-};
+}
 
 export default ScanViewer;

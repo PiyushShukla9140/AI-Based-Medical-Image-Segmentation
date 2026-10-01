@@ -70,20 +70,20 @@ function Register() {
   return (
     <div className="w-full max-w-lg">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 lg:hidden">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500 text-black shadow-lg shadow-orange-500/20 lg:hidden">
           <Activity size={24} />
         </div>
 
         <h1 className="text-3xl font-bold text-white">Create your account</h1>
 
-        <p className="mt-2 text-sm text-slate-400">
+        <p className="mt-2 text-sm text-neutral-400">
           Set up your medical imaging workspace.
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+        className="space-y-4 rounded-2xl border border-orange-500/10 bg-[#100d0b] p-6 shadow-xl shadow-black/30"
       >
         {error && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
@@ -93,29 +93,29 @@ function Register() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Full name
             </label>
 
             <div className="relative">
               <User
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
               />
 
               <input
                 name="fullName"
                 value={form.fullName}
                 onChange={handleChange}
-                placeholder="Dr. John Doe"
+                placeholder="Name"
                 required
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-3 text-sm text-white outline-none focus:border-blue-500"
+                className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] py-3 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Username
             </label>
 
@@ -123,20 +123,20 @@ function Register() {
               name="username"
               value={form.username}
               onChange={handleChange}
-              placeholder="johndoe"
+              placeholder="username"
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] px-3 py-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-300">Email</label>
+          <label className="mb-2 block text-sm text-neutral-300">Email</label>
 
           <div className="relative">
             <Mail
               size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
             />
 
             <input
@@ -146,18 +146,20 @@ function Register() {
               onChange={handleChange}
               placeholder="doctor@example.com"
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-3 text-sm text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] py-3 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-300">Password</label>
+          <label className="mb-2 block text-sm text-neutral-300">
+            Password
+          </label>
 
           <div className="relative">
             <Lock
               size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
             />
 
             <input
@@ -168,20 +170,20 @@ function Register() {
               placeholder="••••••••"
               minLength={6}
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-3 text-sm text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] py-3 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Role</label>
+            <label className="mb-2 block text-sm text-neutral-300">Role</label>
 
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] px-3 py-3 text-sm text-white outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
             >
               <option value="doctor">Doctor</option>
               <option value="radiologist">Radiologist</option>
@@ -191,7 +193,7 @@ function Register() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm text-neutral-300">
               Specialization
             </label>
 
@@ -200,13 +202,13 @@ function Register() {
               value={form.specialization}
               onChange={handleChange}
               placeholder="Radiology"
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-neutral-800 bg-[#0b0908] px-3 py-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-300">
+          <label className="mb-2 block text-sm text-neutral-300">
             Profile image
           </label>
 
@@ -214,22 +216,25 @@ function Register() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="block w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-400 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-sm file:text-white"
+            className="block w-full rounded-lg border border-neutral-800 bg-[#0b0908] p-3 text-sm text-neutral-400 file:mr-4 file:rounded-md file:border-0 file:bg-orange-500 file:px-3 file:py-2 file:text-sm file:font-medium file:text-black file:transition hover:file:bg-orange-400"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 py-3 text-sm font-semibold text-black shadow-lg shadow-orange-500/20 transition hover:from-orange-400 hover:to-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <UserPlus size={18} />
           {loading ? "Creating account..." : "Create account"}
         </button>
 
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-neutral-500">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">
+          <Link
+            to="/login"
+            className="font-medium text-orange-400 transition hover:text-orange-300"
+          >
             Sign in
           </Link>
         </p>

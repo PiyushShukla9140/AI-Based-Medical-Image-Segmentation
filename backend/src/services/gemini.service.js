@@ -25,25 +25,26 @@ export const analyzeMedicalImageWithGemini = async (
     const prompt = `
 You are an AI medical image analysis assistant.
 
-Analyze the uploaded medical image carefully.
+Analyze the uploaded medical image carefully and consistently.
 
 Selected scan type:
 ${scanType}
 
 IMPORTANT RULES:
 
-1. First determine whether the uploaded image is a real medical image.
+1. IMAGE VALIDATION
 
-2. Determine whether the image matches the selected scan type.
+First determine whether the uploaded image is a real medical image.
 
-3. Reject these as invalid:
-   - screenshots
-   - file explorers
-   - desktop screenshots
-   - UI screenshots
-   - documents
-   - unrelated photographs
-   - non-medical images
+Reject:
+
+- screenshots
+- file explorers
+- desktop screenshots
+- UI screenshots
+- documents
+- unrelated photographs
+- non-medical images
 
 For an invalid image:
 
@@ -53,13 +54,21 @@ For an invalid image:
 
 Explain why it is invalid in "overallFindings".
 
-4. For a valid medical image:
+2. SCAN TYPE
+
+Determine whether the image matches the selected scan type.
+
+If the image does not match the selected scan type, treat it as invalid.
+
+3. MEDICAL IMAGE ANALYSIS
+
+For a valid medical image:
 
 "isMedicalImage": true
 
-Perform a systematic visual examination of the entire image.
+Systematically inspect the entire image.
 
-For the selected scan type, inspect for visible abnormalities such as:
+Look for clearly visible abnormalities relevant to the selected scan type, including:
 
 - fractures
 - dislocations
@@ -80,12 +89,27 @@ Do not invent findings.
 
 Only report abnormalities that are visually supported by the image.
 
-5. IMPORTANT DETECTION RULE:
+Do not diagnose conditions with certainty.
 
-If you identify a visible abnormality, you MUST create an entry inside
-"detectedRegions".
+Describe imaging findings rather than making unsupported clinical diagnoses.
 
-Each detected region must contain:
+4. CONSISTENCY
+
+Analyze the actual image evidence.
+
+Do not randomly change findings between analyses.
+
+If the same visible abnormality is present in the image, report it consistently.
+
+Do not add an abnormality merely because a similar abnormality could theoretically exist.
+
+Do not remove an abnormality merely because the image is being analyzed again.
+
+5. DETECTED REGIONS
+
+If a visible abnormality is identified, create a corresponding entry in "detectedRegions".
+
+Each detected region MUST contain:
 
 - label
 - category
@@ -93,11 +117,11 @@ Each detected region must contain:
 - box2d
 - clinicalDescription
 
-6. Bounding boxes:
+Every detected abnormality must have a bounding box.
 
-Every abnormality must have a bounding box.
+6. BOUNDING BOX FORMAT
 
-Coordinates must use this exact normalized 0-1000 format:
+Coordinates MUST use normalized 0-1000 coordinates.
 
 ymin = top
 xmin = left
@@ -113,20 +137,23 @@ Example:
   "xmax": 700
 }
 
-The bounding box must cover the visible abnormal area as accurately as possible.
+The bounding box must cover the visible abnormal area.
 
-7. Confidence:
+Do not create a bounding box for an area where there is no visible abnormality.
 
-confidenceScore must be a number between 0 and 1.
+7. CONFIDENCE
 
-Example:
+confidenceScore must be between 0 and 1.
 
-0.92
+The confidence score must reflect the visual evidence.
 
-8. Severity:
+Do not use arbitrary confidence values.
 
-Use:
+8. SEVERITY
 
+Allowed values:
+
+"Invalid"
 "Normal"
 "Low"
 "Moderate"
@@ -134,28 +161,47 @@ Use:
 
 Use "Normal" ONLY when no clinically relevant visible abnormality is identified.
 
-Use "Low", "Moderate", or "High" when a visible abnormality is identified.
+If a visible abnormality is identified, use Low, Moderate, or High based on the apparent severity of the visible finding.
 
-9. Do not automatically assume an image is normal.
+9. NORMAL IMAGE
 
-Inspect the entire image before deciding.
+If the image is valid and no clinically relevant abnormality is clearly visible:
 
-10. Do not provide a diagnosis with certainty.
+"isMedicalImage": true
+"severityLevel": "Normal"
+"detectedRegions": []
 
-Describe only visible imaging findings.
+Do not create artificial detections just to populate the detectedRegions array.
+
+10. FINAL CHECK
+
+Before returning the result:
+
+- Verify that every detected region corresponds to a visible finding.
+- Verify every detected region has a valid bounding box.
+- Verify xmin < xmax.
+- Verify ymin < ymax.
+- Verify all coordinates are between 0 and 1000.
+- Verify confidenceScore is between 0 and 1.
+- Verify severityLevel matches the findings.
+- If there are no supported abnormalities, return an empty detectedRegions array.
 
 Return ONLY valid JSON.
 `;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
+
       contents: [
         imagePart,
         {
           text: prompt,
         },
       ],
+
       config: {
+        temperature: 0,
+
         responseMimeType: "application/json",
 
         responseSchema: {
@@ -256,7 +302,41 @@ Return ONLY valid JSON.
       result.detectedRegions = [];
     }
 
-    console.log("========== GEMINI RESULT ==========");
+    result.detectedRegions = result.detectedRegions.filter((region) => {
+      const box = region?.box2d;
+
+      if (!box) {
+        return false;
+      }
+
+      const ymin = Number(box.ymin);
+      const xmin = Number(box.xmin);
+      const ymax = Number(box.ymax);
+      const xmax = Number(box.xmax);
+      const confidence = Number(region.confidenceScore);
+
+      return (
+        Number.isFinite(ymin) &&
+        Number.isFinite(xmin) &&
+        Number.isFinite(ymax) &&
+        Number.isFinite(xmax) &&
+        ymin >= 0 &&
+        ymin <= 1000 &&
+        xmin >= 0 &&
+        xmin <= 1000 &&
+        ymax >= 0 &&
+        ymax <= 1000 &&
+        xmax >= 0 &&
+        xmax <= 1000 &&
+        ymin < ymax &&
+        xmin < xmax &&
+        Number.isFinite(confidence) &&
+        confidence >= 0 &&
+        confidence <= 1
+      );
+    });
+
+    console.log("GEMINI RESULT:");
     console.log(JSON.stringify(result, null, 2));
 
     return result;

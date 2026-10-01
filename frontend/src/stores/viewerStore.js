@@ -1,8 +1,5 @@
 import { create } from "zustand";
-import {
-  getScanForViewer,
-  verifyRegion,
-} from "../services/viewer.service";
+import { getScanForViewer, verifyRegion } from "../services/viewer.service";
 
 const useViewerStore = create((set) => ({
   scan: null,
@@ -16,6 +13,7 @@ const useViewerStore = create((set) => ({
     set({
       isLoading: true,
       error: null,
+      selectedRegion: null,
     });
 
     try {
@@ -30,9 +28,7 @@ const useViewerStore = create((set) => ({
     } catch (error) {
       set({
         isLoading: false,
-        error:
-          error.response?.data?.message ||
-          "Failed to load scan",
+        error: error.response?.data?.message || "Failed to load scan",
       });
 
       throw error;
@@ -53,10 +49,7 @@ const useViewerStore = create((set) => ({
 
   verifySelectedRegion: async (regionId, data) => {
     try {
-      const updatedRegion = await verifyRegion(
-        regionId,
-        data
-      );
+      const updatedRegion = await verifyRegion(regionId, data);
 
       set((state) => ({
         scan: state.scan
@@ -65,14 +58,12 @@ const useViewerStore = create((set) => ({
               analysis: state.scan.analysis
                 ? {
                     ...state.scan.analysis,
-                    detectedRegions:
-                      state.scan.analysis.detectedRegions.map(
-                        (region) =>
-                          region._id ===
-                          updatedRegion._id
-                            ? updatedRegion
-                            : region
-                      ),
+                    detectedRegions: state.scan.analysis.detectedRegions.map(
+                      (region) =>
+                        region._id === updatedRegion._id
+                          ? updatedRegion
+                          : region,
+                    ),
                   }
                 : state.scan.analysis,
             }
@@ -83,9 +74,7 @@ const useViewerStore = create((set) => ({
       return updatedRegion;
     } catch (error) {
       set({
-        error:
-          error.response?.data?.message ||
-          "Failed to verify region",
+        error: error.response?.data?.message || "Failed to verify region",
       });
 
       throw error;
@@ -94,19 +83,13 @@ const useViewerStore = create((set) => ({
 
   zoomIn: () => {
     set((state) => ({
-      zoom: Math.min(
-        Number((state.zoom + 0.25).toFixed(2)),
-        4
-      ),
+      zoom: Math.min(Number((state.zoom + 0.25).toFixed(2)), 4),
     }));
   },
 
   zoomOut: () => {
     set((state) => ({
-      zoom: Math.max(
-        Number((state.zoom - 0.25).toFixed(2)),
-        0.5
-      ),
+      zoom: Math.max(Number((state.zoom - 0.25).toFixed(2)), 0.5),
     }));
   },
 

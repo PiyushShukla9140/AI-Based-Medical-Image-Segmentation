@@ -15,46 +15,48 @@ export const normalizeBox = (box) => {
   }
 
   return {
-    xmin: Number(box.xmin ?? 0),
-    ymin: Number(box.ymin ?? 0),
-    xmax: Number(box.xmax ?? 0),
-    ymax: Number(box.ymax ?? 0),
+    xmin: Number(box.xmin),
+    ymin: Number(box.ymin),
+    xmax: Number(box.xmax),
+    ymax: Number(box.ymax),
   };
 };
 
-export const getBoxStyle = (box, imageWidth, imageHeight) => {
+export const getBoxStyle = (box) => {
   const normalized = normalizeBox(box);
 
-  if (!normalized || !imageWidth || !imageHeight) {
+  if (!normalized) {
     return null;
   }
 
-  const isNormalized =
-    normalized.xmin >= 0 &&
-    normalized.xmin <= 1 &&
-    normalized.xmax >= 0 &&
-    normalized.xmax <= 1 &&
-    normalized.ymin >= 0 &&
-    normalized.ymin <= 1 &&
-    normalized.ymax >= 0 &&
-    normalized.ymax <= 1;
+  const { xmin, ymin, xmax, ymax } = normalized;
 
-  const left = isNormalized ? normalized.xmin * imageWidth : normalized.xmin;
+  if (
+    !Number.isFinite(xmin) ||
+    !Number.isFinite(ymin) ||
+    !Number.isFinite(xmax) ||
+    !Number.isFinite(ymax)
+  ) {
+    return null;
+  }
 
-  const top = isNormalized ? normalized.ymin * imageHeight : normalized.ymin;
+  if ([xmin, ymin, xmax, ymax].every((value) => value >= 0 && value <= 1000)) {
+    return {
+      left: `${(xmin / 1000) * 100}%`,
+      top: `${(ymin / 1000) * 100}%`,
+      width: `${((xmax - xmin) / 1000) * 100}%`,
+      height: `${((ymax - ymin) / 1000) * 100}%`,
+    };
+  }
 
-  const width = isNormalized
-    ? (normalized.xmax - normalized.xmin) * imageWidth
-    : normalized.xmax - normalized.xmin;
+  if ([xmin, ymin, xmax, ymax].every((value) => value >= 0 && value <= 1)) {
+    return {
+      left: `${xmin * 100}%`,
+      top: `${ymin * 100}%`,
+      width: `${(xmax - xmin) * 100}%`,
+      height: `${(ymax - ymin) * 100}%`,
+    };
+  }
 
-  const height = isNormalized
-    ? (normalized.ymax - normalized.ymin) * imageHeight
-    : normalized.ymax - normalized.ymin;
-
-  return {
-    left: Math.max(0, left),
-    top: Math.max(0, top),
-    width: Math.max(0, width),
-    height: Math.max(0, height),
-  };
+  return null;
 };

@@ -1,12 +1,6 @@
 import { useEffect } from "react";
-import {
-  ArrowLeft,
-  LoaderCircle,
-} from "lucide-react";
-import {
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import AIAnalysisSummary from "../components/ai/AIAnalysisSummary";
 import DetectionReviewPanel from "../components/ai/DetectionReviewPanel";
@@ -16,13 +10,7 @@ const AIAnalysis = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const {
-    scan,
-    isLoading,
-    error,
-    fetchAnalysis,
-    reset,
-  } = useAIStore();
+  const { scan, isLoading, error, fetchAnalysis, reset } = useAIStore();
 
   useEffect(() => {
     reset();
@@ -35,12 +23,9 @@ const AIAnalysis = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-400">
-          <LoaderCircle
-            size={20}
-            className="animate-spin"
-          />
+      <div className="flex min-h-[500px] items-center justify-center bg-[#0b0908]">
+        <div className="flex items-center gap-3 text-neutral-400">
+          <LoaderCircle size={20} className="animate-spin text-orange-500" />
           Loading AI analysis...
         </div>
       </div>
@@ -57,45 +42,37 @@ const AIAnalysis = () => {
 
   if (!scan) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+      <div className="rounded-2xl border border-neutral-800 bg-[#100d0b] p-8 text-center text-neutral-400">
         Scan not found.
       </div>
     );
   }
 
   const analysis = scan.analysis;
-  const regions =
-    analysis?.detectedRegions || [];
+  const regions = analysis?.detectedRegions || [];
 
   return (
     <div className="space-y-6">
       <button
-        onClick={() =>
-          navigate(`/scans/${scan._id}`)
-        }
-        className="flex items-center gap-2 text-sm text-slate-400 hover:text-white"
+        type="button"
+        onClick={() => navigate(`/scans/${scan._id}`)}
+        className="flex items-center gap-2 text-sm text-neutral-400 transition hover:text-orange-400"
       >
         <ArrowLeft size={17} />
         Back to Scan Details
       </button>
 
       <div>
-        <h1 className="text-2xl font-semibold text-white">
-          AI Analysis
-        </h1>
+        <h1 className="text-2xl font-semibold text-white">AI Analysis</h1>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-neutral-500">
           {scan.scanType} · {scan.bodyPart}
         </p>
       </div>
 
-      <AIAnalysisSummary
-        analysis={analysis}
-      />
+      <AIAnalysisSummary analysis={analysis} />
 
-      <DetectionReviewPanel
-        regions={regions}
-      />
+      <DetectionReviewPanel regions={regions} />
     </div>
   );
 };
