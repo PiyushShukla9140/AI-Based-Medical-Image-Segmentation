@@ -197,6 +197,12 @@ const userLogout = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+    console.log("=== REFRESH TOKEN DEBUG ===");
+  console.log("req.cookies exists:", !!req.cookies);
+  console.log("refresh cookie exists:", !!req.cookies?.refreshToken);
+  console.log("req.body exists:", !!req.body);
+  console.log("body refresh token exists:", !!req.body?.refreshToken);
+
   // Step 1: Get the incoming refresh token from cookies or request body
   const incomingRefreshToken =
     req.cookies?.refreshToken || req.body?.refreshToken;
