@@ -462,17 +462,17 @@ function Landing() {
 
           <div className="flex items-center gap-3">
             <Link
+              to="/register"
+              className="mv-btn rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2.5 text-sm font-semibold text-black shadow-lg shadow-orange-500/25 transition hover:from-orange-400 hover:to-orange-500"
+            >
+              Register
+            </Link>
+
+            <Link
               to="/login"
               className="hidden px-3 py-2 text-sm text-neutral-300 transition hover:text-orange-400 sm:block"
             >
               Login
-            </Link>
-
-            <Link
-              to="/register"
-              className="mv-btn rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2.5 text-sm font-semibold text-black shadow-lg shadow-orange-500/25 transition hover:from-orange-400 hover:to-orange-500"
-            >
-              Get Started
             </Link>
           </div>
         </div>
@@ -547,7 +547,7 @@ function Landing() {
                 modern platform.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              {/* <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/register"
                   className="mv-btn group flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-black shadow-xl shadow-orange-500/30 transition hover:from-orange-400 hover:to-orange-500"
@@ -565,7 +565,7 @@ function Landing() {
                 >
                   Sign In
                 </Link>
-              </div>
+              </div> */}
 
               <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-xs text-neutral-400">
                 <span className="flex items-center gap-2">
