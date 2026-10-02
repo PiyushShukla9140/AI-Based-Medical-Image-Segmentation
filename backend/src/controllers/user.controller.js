@@ -185,7 +185,7 @@ const userLogout = asyncHandler(async (req, res) => {
         refreshToken: 1, // this removes the field from the document
       },
     },
-   { returnDocument: "after" },
+    { returnDocument: "after" },
   );
 
   return res
@@ -196,40 +196,44 @@ const userLogout = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  // Step 1: Store the incoming refresh token from req.cookies or req.body(Note: authorization header was used in verify hwt only)
-  // Step 2: if no incoming refresh token throw new ApiError
-  // Step 3: verify the incoming refresh token with stored token in env and store it in decoded token
-  // Step 4: find user using that decoded token._id
-  // Step 5: matching step, match the incoming refresh token with refresh stored in user document in mongo db
-  // Step 6: if they doesnt match throw new api error
-  // Step 7: now generate new tokens using generate tokens functions and generate new refresh token
-  // Step 8: return the res
+  // Step 1: Get the incoming refresh token from cookies or request body
+  const incomingRefreshToken =
+    req.cookies?.refreshToken || req.body?.refreshToken;
 
-const incomingRefreshToken =
-  req.cookies?.refreshToken || req.body?.refreshToken;
+  // Step 2: If no refresh token is provided, throw an error
   if (!incomingRefreshToken) {
-    throw new ApiError(404, "Unauthorized request, missing refresh token");
+    throw new ApiError(401, "Unauthorized request, missing refresh token");
   }
 
   try {
+    // Step 3: Verify the refresh token using the refresh token secret
+    // and store the decoded token
     const decodedToken = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET,
     );
 
+    // Step 4: Find the user using the ID from the decoded token
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      throw new ApiError(401, "Refresh Token expired or used");
+      throw new ApiError(401, "Refresh token expired or invalid");
     }
 
+    // Step 5: Compare the incoming refresh token with the token
+    // stored in the user's MongoDB document
     if (incomingRefreshToken !== user?.refreshToken) {
-      throw new ApiError(401, "Refresh Token expired or used");
+      throw new ApiError(401, "Refresh token expired or invalid");
     }
 
+    // Step 6: If the tokens don't match, throw an error
+    // This check is already handled above
+
+    // Step 7: Generate a new access token and refresh token
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessandRefreshToken(user._id);
 
+    // Step 8: Return the response with the new tokens
     return res
       .status(200)
       .cookie("accessToken", accessToken, cookieOptions)
@@ -237,14 +241,22 @@ const incomingRefreshToken =
       .json(
         new ApiResponse(
           200,
-          { accessToken, refreshToken: newRefreshToken },
+          {
+            accessToken,
+            refreshToken: newRefreshToken,
+          },
           "Access token refreshed",
         ),
       );
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
     throw new ApiError(401, "Refresh token expired or invalid");
   }
 });
+
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   res
@@ -327,7 +339,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         email: email,
       },
     },
-   { returnDocument: "after" },
+    { returnDocument: "after" },
   ).select(" -password -refreshToken ");
 
   return res
@@ -370,7 +382,7 @@ const deleteProfileImage = asyncHandler(async (req, res) => {
         profileImage: "",
       },
     },
-   { returnDocument: "after" },
+    { returnDocument: "after" },
   ).select("-password -refreshToken");
 
   if (!updatedUser) {
@@ -413,7 +425,7 @@ const updateProfileImage = asyncHandler(async (req, res) => {
         profileImage: newProfileImage.url,
       },
     },
-  { returnDocument: "after" },
+    { returnDocument: "after" },
   ).select(" -password -refreshToken");
 
   if (!user) {
@@ -469,7 +481,7 @@ const uploadProfileImage = asyncHandler(async (req, res) => {
         profileImage: profileImage.url,
       },
     },
-  { returnDocument: "after" },
+    { returnDocument: "after" },
   ).select(" -password -refreshToken");
 
   if (!user) {
