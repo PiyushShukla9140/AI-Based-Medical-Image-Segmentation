@@ -11,11 +11,7 @@ export const registerUser = async (formData) => {
 };
 
 export const loginUser = async (credentials) => {
-  console.log("API URL:", import.meta.env.VITE_API_URL);
-  console.log("Login data:", credentials);
-
   const response = await api.post("/users/login", credentials);
-
   return getData(response);
 };
 
