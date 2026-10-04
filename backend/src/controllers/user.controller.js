@@ -197,7 +197,7 @@ const userLogout = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    console.log("=== REFRESH TOKEN DEBUG ===");
+  console.log("=== REFRESH TOKEN DEBUG ===");
   console.log("req.cookies exists:", !!req.cookies);
   console.log("refresh cookie exists:", !!req.cookies?.refreshToken);
   console.log("req.body exists:", !!req.body);
@@ -263,7 +263,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Refresh token expired or invalid");
   }
 });
-
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   res
