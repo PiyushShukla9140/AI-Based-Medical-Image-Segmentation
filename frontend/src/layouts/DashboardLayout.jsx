@@ -4,7 +4,7 @@ import Topbar from "../components/layout/Topbar";
 
 function DashboardLayout() {
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#0b0908]">
       <Sidebar />
 
       <div className="min-h-screen md:ml-64">
