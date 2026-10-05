@@ -5,9 +5,11 @@ import {
   logoutUser,
   registerUser,
 } from "../services/auth.service";
+import { setAccessToken } from "../services/api";
 
 const useAuthStore = create((set) => ({
   user: null,
+  accessToken: null,
   isAuthenticated: false,
   isLoading: true,
 
@@ -15,8 +17,13 @@ const useAuthStore = create((set) => ({
     const data = await registerUser(formData);
 
     if (data?.user) {
+      const token = data?.accessToken ?? null;
+
+      setAccessToken(token);
+
       set({
         user: data.user,
+        accessToken: token,
         isAuthenticated: true,
         isLoading: false,
       });
@@ -29,8 +36,13 @@ const useAuthStore = create((set) => ({
     const data = await loginUser(credentials);
 
     if (data?.user) {
+      const token = data?.accessToken ?? null;
+
+      setAccessToken(token);
+
       set({
         user: data.user,
+        accessToken: token,
         isAuthenticated: true,
         isLoading: false,
       });
@@ -54,16 +66,22 @@ const useAuthStore = create((set) => ({
         return user;
       }
 
+      setAccessToken(null);
+
       set({
         user: null,
+        accessToken: null,
         isAuthenticated: false,
         isLoading: false,
       });
 
       return null;
     } catch {
+      setAccessToken(null);
+
       set({
         user: null,
+        accessToken: null,
         isAuthenticated: false,
         isLoading: false,
       });
@@ -76,8 +94,11 @@ const useAuthStore = create((set) => ({
     try {
       await logoutUser();
     } finally {
+      setAccessToken(null);
+
       set({
         user: null,
+        accessToken: null,
         isAuthenticated: false,
         isLoading: false,
       });
